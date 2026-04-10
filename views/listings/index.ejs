@@ -2,9 +2,20 @@
     <%= success %>
 
     <% 
-        // TRULY DYNAMIC THEME-BASED STARTING IMAGE
-        const themeKeywords = "luxury,villa,travel,architecture,hotel,pool,ocean";
-        const startImg = `https://images.unsplash.com/featured/1600x900?${themeKeywords}&auto=format&q=45`;
+        // 10 STABLE, HIGH-SPEED CLOUDINARY HERO IMAGES
+        const heroImages = [
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823089/wanderlust_hero_images/hero_3.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823089/wanderlust_hero_images/hero_4.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823090/wanderlust_hero_images/hero_5.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823092/wanderlust_hero_images/hero_7.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823094/wanderlust_hero_images/hero_9.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823095/wanderlust_hero_images/hero_10.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823097/wanderlust_hero_images/hero_12.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823099/wanderlust_hero_images/hero_15.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823100/wanderlust_hero_images/hero_16.jpg",
+            "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823102/wanderlust_hero_images/hero_18.jpg"
+        ];
+        const startImg = heroImages[Math.floor(Math.random() * heroImages.length)];
     %>
 
     <style>
@@ -200,37 +211,42 @@
             });
         }
 
-        // ✅ TRULY RANDOM THEME-BASED HERO (ZERO DELAY)
+        // ✅ PERMANENT CLOUDINARY HERO ROTATOR
         const hero = document.getElementById("hero-section");
         if (hero) {
-            const themeKeywords = "luxury,villa,travel,architecture,hotel,pool,ocean";
-            const baseUrl = `https://images.unsplash.com/featured/1600x900?${themeKeywords}&auto=format&q=40`;
+            const heroImages = [
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823089/wanderlust_hero_images/hero_3.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823089/wanderlust_hero_images/hero_4.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823090/wanderlust_hero_images/hero_5.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823092/wanderlust_hero_images/hero_7.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823094/wanderlust_hero_images/hero_9.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823095/wanderlust_hero_images/hero_10.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823097/wanderlust_hero_images/hero_12.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823099/wanderlust_hero_images/hero_15.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823100/wanderlust_hero_images/hero_16.jpg",
+                "https://res.cloudinary.com/drbeqb6zk/image/upload/v1775823102/wanderlust_hero_images/hero_18.jpg"
+            ];
             
-            let nextImageUrl = "";
+            const currentBg = hero.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
+            let lastIndex = heroImages.indexOf(currentBg);
             
-            function preloadNextImage() {
-                // Generate a unique URL using cache buster
-                const uniqueUrl = `${baseUrl}&sig=${Math.random()}`;
+            function rotateHero() {
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * heroImages.length);
+                } while (randomIndex === lastIndex);
+                
+                lastIndex = randomIndex;
+                const url = heroImages[randomIndex];
+                
+                // Optimized Preloading
                 const img = new Image();
-                img.src = uniqueUrl;
+                img.src = url;
                 img.onload = () => {
-                    nextImageUrl = uniqueUrl;
+                    hero.style.backgroundImage = `url(${url})`;
                 };
             }
 
-            function rotateHero() {
-                if (nextImageUrl) {
-                    hero.style.backgroundImage = `url(${nextImageUrl})`;
-                    preloadNextImage(); // Immediately start loading the one after
-                } else {
-                    // Fallback if the next image isn't ready yet or first run
-                    preloadNextImage();
-                }
-            }
-
-            // Initially start preloading the next image
-            preloadNextImage();
-            
             // Rotate every 2 minutes
             setInterval(rotateHero, 1000 * 60 * 2); 
         }
