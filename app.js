@@ -32,7 +32,11 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
 // Security Middlewares
-app.use(mongoSanitize());
+app.use(
+  mongoSanitize({
+    replaceWith: "_",
+  }),
+);
 app.use(helmet({ contentSecurityPolicy: false }));
 
 const dbUrl = process.env.ATLASDB_URL;
