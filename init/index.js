@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const initData = require('./data.js');
 const Listing = require('../models/listing');
 
-const mongoURL = "mongodb://127.0.0.1:27017/wanderlust";
+const mongoURL = ATLASDB_URL
 
 main().then(() => {
     console.log("Connected to MongoDB");
