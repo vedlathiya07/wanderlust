@@ -132,6 +132,10 @@ app.get("/", (req, res) => {
   res.redirect("/listings");
 });
 
+app.get("/ping", (req, res) => {
+  res.status(200).send("OK");
+});
+
 // Legal Routes
 app.get("/privacy", (req, res) => {
   res.render("legal/privacy");
