@@ -40,9 +40,16 @@
 </head>
 
 <body>
-<%- include("../includes/navbar.ejs", { currUser: locals.currUser, currPath: locals.currPath }) %>
+<%- include("../includes/navbar.ejs", { 
+    currUser: typeof currUser !== "undefined" ? currUser : locals.currUser, 
+    currPath: typeof currPath !== "undefined" ? currPath : locals.currPath 
+}) %>
 <main class="main-content flex-grow-1">
-<%- include("../includes/flash.ejs", { success: locals.success, error: locals.error }) %>    <%- body %>
+<%- include("../includes/flash.ejs", { 
+    success: locals.success, 
+    error: locals.error 
+}) %>
+  <%- body %>
 </main>
 
         <%- include("../includes/footer.ejs") %>
