@@ -177,12 +177,6 @@ body {
   transform: translateY(-50%) scale(1.05);
 }
 
-.hero-large {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 /* Responsive Navbar & Search */
 @media (max-width: 768px) {
   .search-navbar-wrapper {

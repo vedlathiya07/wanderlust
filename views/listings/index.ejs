@@ -1,8 +1,27 @@
 <% layout("/layouts/boilerplate") %>
     <%= success %>
 
+    <% 
+        const heroImages = [
+            "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2070&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1613553507447-514873c27eb4?q=80&w=2070&auto=format&fit=crop"
+        ];
+        const startImg = heroImages[Math.floor(Math.random() * heroImages.length)];
+    %>
+
+    <style>
+        .hero-large {
+            transition: background-image 1.5s ease-in-out;
+            background-color: #2f302c; /* Fallback dark color */
+        }
+    </style>
+
     <div class="hero-wrapper fade-in-up">
-        <div id="hero-section" class="hero-large hero-rounded">
+        <div id="hero-section" class="hero-large hero-rounded" style="background-image: url('<%= startImg %>');">
             <div class="hero-overlay-soft"></div>
             <div class="hero-text-box">
                 <h1 class="hero-title-smooth">Escape to Tranquility</h1>
@@ -198,7 +217,7 @@
             });
         }
 
-        // ✅ PREMIUM 4K HERO ROTATOR
+        // ✅ PREMIUM 4K HERO ROTATOR (FADE-SAFE)
         const hero = document.getElementById("hero-section");
         if (hero) {
             const heroImages = [
@@ -210,8 +229,11 @@
                 "https://images.unsplash.com/photo-1613553507447-514873c27eb4?q=80&w=2070&auto=format&fit=crop"
             ];
 
-            let lastIndex = -1;
-            function changeHeroImage() {
+            // Initial current image is set in EJS, find its index
+            const currentBg = hero.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
+            let lastIndex = heroImages.indexOf(currentBg);
+            
+            function rotateHeroImage() {
                 let randomIndex;
                 do {
                     randomIndex = Math.floor(Math.random() * heroImages.length);
@@ -220,7 +242,7 @@
                 lastIndex = randomIndex;
                 const url = heroImages[randomIndex];
                 
-                // Preload to avoid flicker
+                // Preload to ensure smooth transition
                 const img = new Image();
                 img.src = url;
                 img.onload = () => {
@@ -228,7 +250,8 @@
                 };
             }
 
-            changeHeroImage(); // Load random on refresh
-            setInterval(changeHeroImage, 1000 * 60 * 2); // Smooth rotate every 2 minutes
+            // Start rotating every 2 minutes as requested
+            setInterval(rotateHeroImage, 1000 * 60 * 2); 
         }
     </script>
+t>
