@@ -1,137 +1,200 @@
 <% layout("/layouts/boilerplate") %>
     <%= success %>
 
-        <style>
-            #filters {
-                display: flex;
-                flex-wrap: wrap;
-                padding-top: 1rem;
-                align-items: center;
-            }
+    <div class="hero-wrapper fade-in-up">
+        <div class="hero-large hero-rounded">
+            <div class="hero-overlay-soft"></div>
+            <div class="hero-text-box">
+                <h1 class="hero-title-smooth">Escape to Tranquility</h1>
+                <p class="fs-5 mb-0 fw-light">Discover handpicked homes that feel like a deep breath.</p>
+            </div>
+        </div>
+    </div>
 
-            .filter {
-                text-align: center;
-                padding-right: 2rem;
-                opacity: 0.7;
-            }
+    <div class="container my-4 fade-in-up" style="animation-delay: 0.1s; position: relative; z-index: 1000;">
+        <div class="filter-section mb-4">
+            <div class="filter-carousel-wrapper">
+                <button class="carousel-control-btn prev" id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="filter-bar" id="filterBar">
+                    <% 
+                       const categories = [
+                         { id: 'All', icon: 'fa-earth-americas', label: 'All Homes' },
+                         { id: 'Curated', icon: 'fa-gem', label: 'Curated' },
+                         { id: 'Coastal', icon: 'fa-water', label: 'Coastal' },
+                         { id: 'Mountain', icon: 'fa-mountain', label: 'Mountain' },
+                         { id: 'Urban', icon: 'fa-city', label: 'Urban' },
+                         { id: 'Nature', icon: 'fa-leaf', label: 'Nature' },
+                         { id: 'Winter', icon: 'fa-snowflake', label: 'Winter' },
+                         { id: 'Wellness', icon: 'fa-spa', label: 'Wellness' },
+                         { id: 'Camping', icon: 'fa-tent', label: 'Camping' },
+                         { id: 'Arctic', icon: 'fa-igloo', label: 'Arctic' },
+                         <!-- { id: 'Desert', icon: 'fa-cactus', label: 'Desert' } -->
+                       ];
+                       const safeSort = typeof currentSort !== 'undefined' ? currentSort : 'default';
+                       const safeCategory = typeof activeCategory !== 'undefined' ? activeCategory : 'All';
+                    %>
+                    
+                    <% for(let cat of categories) { %>
+                        <a href="/listings?category=<%= cat.id %><%= safeSort !== 'default' ? '&sort=' + safeSort : '' %>" 
+                           class="filter-item text-decoration-none align-items-center d-flex flex-column justify-content-center text-dark <%= safeCategory === cat.id ? 'active' : '' %>">
+                            <i class="fa-solid <%= cat.icon %>"></i>
+                            <p><%= cat.label %></p>
+                        </a>
+                    <% } %>
+                </div>
+                <button class="carousel-control-btn next" id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
 
-            .filter:hover {
-                opacity: 1;
-                cursor: pointer;
-            }
-
-            .filter p {
-                font-size: 0.8rem;
-            }
-
-            .tax-info {
-                display: none;
-            }
-
-            .tax-toggle {
-                border: 1px solid black;
-                border-radius: 1rem;
-                height: 3.5rem;
-                padding: 1rem;
-                margin-left: 2rem;
-                margin-bottom: 1rem;
-                display: flex;
-                align-items: center;
-            }
-        </style>
-
-        <body>
-
-            <div id="filters">
-                <div class="filter">
-                    <div><i class="fa-solid fa-fire"></i></div>
-                    <p>Trending</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-bed"></i></div>
-                    <p>Rooms</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-mountain-city"></i></div>
-                    <p>Iconic Cities</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-mountain"></i></div>
-                    <p>Mountains</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-brands fa-fort-awesome"></i></div>
-                    <p>Castles</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-person-swimming"></i></div>
-                    <p>Amazing Pools</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-campground"></i></div>
-                    <p>Camping</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-cow"></i></div>
-                    <p>Farms</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-regular fa-snowflake"></i></div>
-                    <p>Arctic</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-igloo"></i></div>
-                    <p>Doms</p>
-                </div>
-                <div class="filter">
-                    <div><i class="fa-solid fa-ship"></i></div>
-                    <p>Boats</p>
+            <div class="filter-tools mt-3 mt-md-0">
+                <div class="dropdown">
+                    <button class="btn btn-outline-soft dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-arrow-down-short-wide"></i> 
+                        Sort: <span class="d-none d-sm-inline"><%= safeSort === 'price_asc' ? 'Lowest Price' : safeSort === 'price_desc' ? 'Highest Price' : safeSort === 'newest' ? 'Newest' : 'Recommended' %></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-soft border-0 rounded-4 p-2">
+                        <li><a class="dropdown-item rounded-3" href="/listings?sort=default&category=<%= safeCategory %>">Recommended</a></li>
+                        <li><a class="dropdown-item rounded-3" href="/listings?sort=price_asc&category=<%= safeCategory %>">Price: Low to High</a></li>
+                        <li><a class="dropdown-item rounded-3" href="/listings?sort=price_desc&category=<%= safeCategory %>">Price: High to Low</a></li>
+                        <li><a class="dropdown-item rounded-3" href="/listings?sort=newest&category=<%= safeCategory %>">Newest Arrivals</a></li>
+                    </ul>
                 </div>
 
-
-                <div class="tax-toggle">
-                    <div class="form-check-reverse form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                        <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+                <div class="tax-toggle-box d-flex align-items-center rounded-pill">
+                    <div class="form-check form-switch m-0 d-flex align-items-center">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" style="cursor: pointer; margin-top:0;">
+                        <label class="form-check-label ms-2 fw-medium text-muted" for="flexSwitchCheckDefault" style="font-size: 0.82rem; cursor: pointer; white-space: nowrap;">Display total with taxes</label>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-1">
-                <% for(let listing of allListings) { %>
-                    <a href="/listings/<%= listing._id %>" class="listing-link">
-                        <div class="card listing-card">
-                            <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image"
-                                style="height: 20rem;">
-                            <div class="card-img-overlay"></div>
-                            <div class="card-body">
-                                <p class="card-text">
-                                    <b>
-                                        <%= listing.title %>
-                                    </b>
-                                    <br>
-                                    &#8377; <%= listing.price.toLocaleString("en-IN") %> /night
-                                        <i class="tax-info"> &nbsp; &nbsp; +18% GST</i>
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                    <% } %>
+    <div class="container mb-5 pb-5 fade-in-up" style="animation-delay: 0.2s;">
+        <% if(allListings.length === 0) { %>
+            <div class="text-center my-5 py-5 text-muted">
+                <i class="fa-solid fa-house-chimney-crack fs-1 mb-3 opacity-50"></i>
+                <h4 class="fw-light">No properties found.</h4>
+                <p>Try adjusting your search or category filters.</p>
+                <a href="/listings" class="btn btn-primary-soft rounded-pill mt-3 px-4">Clear Filters</a>
             </div>
+        <% } else { %>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+                <% for(let listing of allListings) { %>
+                    <div class="col property-col">
+                        <a href="/listings/<%= encodeId(listing._id) %>" class="listing-link">
+                            <div class="card property-card-smooth h-100">
+                                <div class="property-img-wrapper">
+                                    <% 
+                                       let displayUrl = "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?auto=format&fit=crop&w=1920&q=80";
+                                       if (listing.images && listing.images.length > 0) {
+                                           displayUrl = listing.images[0].url;
+                                       } else if (listing.image && listing.image.url) {
+                                           displayUrl = listing.image.url;
+                                       }
+                                    %>
+                                    <img src="<%= displayUrl %>" class="property-img" alt="Property Image">
+                                    <div class="favorite-btn position-absolute top-0 end-0 m-3 text-white <%= (currUser && currUser.wishlist && currUser.wishlist.some(id => id.toString() === listing._id.toString())) ? 'active' : '' %>" 
+                                         data-id="<%= listing._id %>" 
+                                         style="z-index: 10;">
+                                        <i class="<%= (currUser && currUser.wishlist && currUser.wishlist.some(id => id.toString() === listing._id.toString())) ? 'fa-solid' : 'fa-regular' %> fa-heart"></i>
+                                    </div>
+                                    <% if(listing.category && listing.category !== 'Curated') { %>
+                                        <div class="badge-category position-absolute top-0 start-0 m-3">
+                                            <%= listing.category %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                <div class="property-info">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="property-title text-truncate mb-0 fw-bold"><%= listing.location %>, <%= listing.country %></h6>
+                                        <% if (listing.avgRating > 0) { %>
+                                            <div class="d-flex align-items-center gap-1 property-rating">
+                                                <i class="fa-solid fa-star" style="font-size: 0.7rem;"></i>
+                                                <span><%= listing.avgRating %></span>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <p class="property-subtitle text-muted mb-2 text-truncate"><%= listing.title %></p>
+                                    <p class="property-price mb-0">
+                                        <span class="fw-bold text-dark">&#8377; <%= listing.price.toLocaleString("en-IN") %></span>  <span class="text-muted fw-normal" style="font-size:0.9rem;">/night</span>
+                                        <span class="tax-info text-muted ms-1" style="display: none; font-size: 0.8rem;">(+18% GST)</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
 
-            <script>
-                let taxSwitch = document.getElementById("flexSwitchCheckDefault");
-                taxSwitch.addEventListener("click", () => {
-                    let taxInfo = document.getElementsByClassName("tax-info");
-                    for (info of taxInfo) {
-                        if (info.style.display != "inline") {
+    <script>
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const listingId = this.dataset.id;
+                const icon = this.querySelector('i');
+                
+                // Optimistic UI update
+                const isActive = this.classList.contains('active');
+                if (!isActive) {
+                    icon.classList.replace('fa-regular', 'fa-solid');
+                    this.classList.add('active');
+                    this.style.transform = 'scale(1.3)';
+                    setTimeout(() => this.style.transform = 'scale(1)', 200);
+                } else {
+                    icon.classList.replace('fa-solid', 'fa-regular');
+                    this.classList.remove('active');
+                }
 
-                            info.style.display = "inline";
-                        } else {
-                            info.style.display = "none";
-                        }
+                try {
+                    const response = await fetch(`/wishlist/${listingId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        // Revert if error (e.g. not logged in)
+                        window.location.href = '/login';
                     }
-                })
-            </script>
+                } catch (err) {
+                    console.error("Favorite toggle failed:", err);
+                }
+            });
+        });
 
-        </body>
+        let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+        taxSwitch.addEventListener("change", () => {
+            let taxInfoElements = document.querySelectorAll(".tax-info");
+            for (let info of taxInfoElements) {
+                if (taxSwitch.checked) {
+                    info.style.display = "inline";
+                } else {
+                    info.style.display = "none";
+                }
+            }
+        });
+
+        // Category Carousel Logic
+        const filterBar = document.getElementById('filterBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        if (filterBar && prevBtn && nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                filterBar.scrollBy({ left: 300, behavior: 'smooth' });
+            });
+            prevBtn.addEventListener('click', () => {
+                filterBar.scrollBy({ left: -300, behavior: 'smooth' });
+            });
+
+            // Toggle arrow visibility based on scroll
+            filterBar.addEventListener('scroll', () => {
+                prevBtn.style.opacity = filterBar.scrollLeft > 20 ? '1' : '0.3';
+                nextBtn.style.opacity = filterBar.scrollLeft < (filterBar.scrollWidth - filterBar.clientWidth - 20) ? '1' : '0.3';
+            });
+        }
+    </script>

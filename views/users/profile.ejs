@@ -1,0 +1,156 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container py-5 fade-in-up">
+    <!-- Profile Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex align-items-center gap-4 p-4 bg-white rounded-4 shadow-soft border">
+                <% if (currUser.image && currUser.image.url) { %>
+                    <img src="<%= currUser.image.url %>" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;">
+                <% } else { %>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white shadow-sm" style="width: 80px; height: 80px; font-size: 2rem; background: linear-gradient(135deg, var(--accent-main), #8fa191); flex-shrink: 0;">
+                        <%= currUser.username.charAt(0).toUpperCase() %>
+                    </div>
+                <% } %>
+                <div>
+                    <h2 class="fw-bold mb-1 text-dark"><%= currUser.username %></h2>
+                    <p class="text-muted mb-0"><i class="fa-solid fa-envelope me-2"></i><%= currUser.email %></p>
+                    <div class="d-flex align-items-center gap-3 mt-2">
+                        <span class="badge px-3 py-2" style="background: rgba(92,113,94,0.12); color: var(--accent-main); border-radius: 20px; font-size: 0.78rem; font-weight: 600;">Wanderlust Member</span>
+                        <a href="/profile/edit" class="text-decoration-none text-muted fw-medium" style="font-size: 0.85rem;"><i class="fa-solid fa-pen-to-square me-1"></i>Edit Profile</a>
+                    </div>
+                </div>
+                <div class="ms-auto text-end d-none d-md-block">
+                    <p class="text-muted mb-1" style="font-size: 0.8rem;">Member since</p>
+                    <p class="fw-medium text-dark mb-0"><%= new Date(currUser._id.getTimestamp()).getFullYear() %></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-5">
+        <div class="col-4">
+            <div class="text-center p-4 bg-white rounded-4 border shadow-soft">
+                <h3 class="fw-bold text-dark mb-1"><%= myListings.length %></h3>
+                <p class="text-muted mb-0" style="font-size: 0.85rem;">Properties Listed</p>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="text-center p-4 bg-white rounded-4 border shadow-soft">
+                <h3 class="fw-bold text-dark mb-1">0</h3>
+                <p class="text-muted mb-0" style="font-size: 0.85rem;">Trips Booked</p>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="text-center p-4 bg-white rounded-4 border shadow-soft">
+                <h3 class="fw-bold text-dark mb-1">★ <%= myListings.length > 0 ? "4.9" : "0.0" %></h3>
+                <p class="text-muted mb-0" style="font-size: 0.85rem;">Host Rating</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Listings -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold text-dark mb-0">My Properties</h4>
+        <a href="/listings/new" class="btn btn-primary-smooth px-4 shadow-soft">
+            <i class="fa-solid fa-plus me-2"></i>Add New
+        </a>
+    </div>
+
+    <% if (myListings.length === 0) { %>
+        <div class="text-center py-5 bg-white rounded-4 border shadow-soft">
+            <i class="fa-solid fa-house-circle-xmark text-muted mb-3" style="font-size: 3rem;"></i>
+            <h5 class="text-muted fw-medium">No properties listed yet</h5>
+            <p class="text-muted mb-4" style="font-size: 0.9rem;">Start earning by listing your first property</p>
+            <a href="/listings/new" class="btn btn-primary-smooth px-5 shadow-soft">List a Property</a>
+        </div>
+    <% } else { %>
+        <div class="row g-4">
+            <% for (let listing of myListings) { %>
+                <div class="col-md-6 col-lg-4">
+                    <div class="property-card-smooth">
+                        <a href="/listings/<%= encodeId(listing._id) %>" class="listing-link text-decoration-none text-dark">
+                            <div class="property-img-wrapper">
+                                <% 
+                                    let profileListingImg = "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?auto=format&fit=crop&w=1920&q=80";
+                                    if (listing.images && listing.images.length > 0) {
+                                        profileListingImg = listing.images[0].url;
+                                    } else if (listing.image && listing.image.url) {
+                                        profileListingImg = listing.image.url;
+                                    }
+                                %>
+                                <img src="<%= profileListingImg %>" class="property-img" alt="<%= listing.title %>">
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <span class="badge-category"><%= listing.category || 'Curated' %></span>
+                                </div>
+                            </div>
+                            <div class="property-info">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                <h6 class="property-title text-truncate mb-0 fw-bold" style="font-size: 1rem;"><%= listing.location %>, <%= listing.country %></h6>
+                            </div>
+                            <p class="property-subtitle text-muted mb-2 text-truncate" style="font-size: 0.9rem;"><%= listing.title %></p>
+                            <p class="property-price mb-0">
+                                <span class="fw-bold text-dark" style="font-size: 1.1rem;">&#8377; <%= listing.price.toLocaleString("en-IN") %></span>
+                                <span class="text-muted fw-normal" style="font-size:0.9rem;">/ night</span>
+                            </p>
+                        </div>
+                    </a>
+                    <div class="d-flex gap-2 px-3 pb-3">
+                        <a href="/listings/<%= encodeId(listing._id) %>/edit" class="btn btn-outline-soft btn-sm flex-grow-1" style="font-size: 0.9rem; padding: 8px;">Edit Listing</a>
+                        <form action="/listings/<%= encodeId(listing._id) %>?_method=DELETE" method="post" class="flex-grow-1 m-0">
+                            <button class="btn btn-sm w-100" style="font-size: 0.9rem; padding: 8px; border: 1px solid #D9534F; color: #D9534F; border-radius: var(--radius-sm);">Delete</button>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+    <!-- Saved Wishlist -->
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-5">
+        <h4 class="fw-bold text-dark mb-0">Saved Wishlist</h4>
+        <span class="badge rounded-pill bg-light text-muted px-3 py-2 border"><%= wishlist.length %> Saved</span>
+    </div>
+
+    <% if (!wishlist || wishlist.length === 0) { %>
+        <div class="text-center py-5 bg-white rounded-4 border shadow-soft mb-5">
+            <i class="fa-regular fa-heart text-muted mb-3" style="font-size: 3rem;"></i>
+            <h5 class="text-muted fw-medium">Your wishlist is empty</h5>
+            <p class="text-muted mb-4" style="font-size: 0.9rem;">Tap the heart on properties to save them here</p>
+            <a href="/listings" class="btn btn-outline-soft px-5">Browse Homes</a>
+        </div>
+    <% } else { %>
+        <div class="row g-4 mb-5">
+            <% for (let item of wishlist) { %>
+                <div class="col-md-6 col-lg-4">
+                    <div class="property-card-smooth">
+                        <a href="/listings/<%= encodeId(item._id) %>" class="listing-link text-decoration-none text-dark">
+                            <div class="property-img-wrapper">
+                                <% 
+                                    let itemImg = "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?auto=format&fit=crop&w=1920&q=80";
+                                    if (item.images && item.images.length > 0) {
+                                        itemImg = item.images[0].url;
+                                    } else if (item.image && item.image.url) {
+                                        itemImg = item.image.url;
+                                    }
+                                %>
+                                <img src="<%= itemImg %>" class="property-img" alt="<%= item.title %>">
+                                <div class="favorite-btn active position-absolute top-0 end-0 m-3" style="background: white; color: #ff385c;">
+                                    <i class="fa-solid fa-heart"></i>
+                                </div>
+                            </div>
+                            <div class="property-info">
+                                <h6 class="property-title text-truncate mb-0 fw-bold"><%= item.location %>, <%= item.country %></h6>
+                                <p class="property-subtitle text-muted mb-2 text-truncate"><%= item.title %></p>
+                                <p class="property-price mb-0">
+                                    <span class="fw-bold text-dark">&#8377; <%= item.price.toLocaleString("en-IN") %> / night</span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>

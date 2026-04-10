@@ -15,4 +15,17 @@
             form.classList.add('was-validated')
         }, false)
     })
+
+    // Password Toggle Logic
+    const togglePassword = document.querySelector('#togglePassword');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const password = document.querySelector('#password');
+            const eyeIcon = this.querySelector('i');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+    }
 })()

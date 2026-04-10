@@ -1,62 +1,71 @@
 <% layout("/layouts/boilerplate") %>
-
-
-    <body>
-
-        <div class="row mt-3">
-            <div class="col-8 offset-2">
-
-                <h3>Edit your listing </h3>
-                <form method="post" action="/listings/<%= listing._id %>?_method=PUT" novalidate
-                    class="needs-validation" enctype="multipart/form-data">
-
-                    <div class="mb-3">
-                        <label for="title" class="form-lable">Title</label>
-                        <input type="text" id="title" name="listing[title]" value="<%= listing.title %>"
-                            class="form-control" required>
-                        <div class="valid-feedback">Title looks good!</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-lable" required>Description</label>
-                        <textarea id="description" name="listing[description]" class="form-control"
-                            required><%= listing.description %></textarea>
-                        <div class="invalid-feedback">Please enter a short description</div>
-                    </div>
-
-                    <div class="mb-3">
-                        Original Listing Image <br>
-                        <img src="<%= originalImageUrl %>">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="image" class="form-lable">Upload New Image</label>
-                        <input type="file" id="image" name="listing[image]" class="form-control">
-                    </div>
-                    <div class="row">
-                        <div class="mb-3 col-md-4">
-                            <label for="price" class="form-lable" required>Price</label>
-                            <input type="number" id="price" name="listing[price]" value="<%= listing.price %>"
-                                class="form-control">
-                            <div class="invalid-feedback">Price should be valid</div>
-                        </div>
-                        <div class="mb-3 col-md-8">
-                            <label for="country" class="form-lable" required>Country</label>
-                            <input type="text" id="country" name="listing[country]" value="<%= listing.country %>"
-                                class="form-control">
-                            <div class="invalid-feedback">Country should be valid</div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="location" class="form-lable" required>Location</label>
-                        <input type="text" id="location" name="listing[location]" value="<%= listing.location %>"
-                            class="form-control">
-                        <div class="invalid-feedback">Location should be valid</div>
-                    </div>
-
-
-                    <button class="btn btn-dark edit-btn mt-3 mb-3">Edit</button>
-                </form>
+<div class="container d-flex justify-content-center fade-in-up">
+    <div class="form-container w-100 p-5 mt-5 mb-5" style="max-width: 800px;">
+        <h2 class="text-center mb-4 fw-bold text-dark pb-3">Edit Property Details</h2>
+        <form method="post" action="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
+            
+            <div class="mb-4">
+                <label for="title" class="form-label text-muted">Property Title</label>
+                <input type="text" id="title" name="listing[title]" value="<%= listing.title %>" class="form-control" required>
+                <div class="valid-feedback">Title looks great!</div>
             </div>
-        </div>
-    </body>
+
+            <div class="mb-4">
+                <label for="description" class="form-label text-muted">Detailed Description</label>
+                <textarea id="description" name="listing[description]" class="form-control" rows="5" required><%= listing.description %></textarea>
+                <div class="invalid-feedback">Please enter a description</div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="category" class="form-label text-muted">Category</label>
+                <select id="category" name="listing[category]" class="form-select form-control" required>
+                    <option value="Curated" <%= listing.category === 'Curated' ? 'selected' : '' %>>Curated</option>
+                    <option value="Coastal" <%= listing.category === 'Coastal' ? 'selected' : '' %>>Coastal</option>
+                    <option value="Mountain" <%= listing.category === 'Mountain' ? 'selected' : '' %>>Mountain</option>
+                    <option value="Urban" <%= listing.category === 'Urban' ? 'selected' : '' %>>Urban</option>
+                    <option value="Nature" <%= listing.category === 'Nature' ? 'selected' : '' %>>Nature</option>
+                    <option value="Winter" <%= listing.category === 'Winter' ? 'selected' : '' %>>Winter</option>
+                    <option value="Wellness" <%= listing.category === 'Wellness' ? 'selected' : '' %>>Wellness</option>
+                </select>
+            </div>
+
+            <div class="mb-4 pb-4 border-bottom">
+                <p class="form-label text-muted mb-2">Original Photography Preview (First Image)</p>
+                <div class="bg-light p-3 border mb-3 text-center" style="border-radius: var(--radius-sm);">
+                    <% if (originalImageUrl) { %>
+                        <img src="<%= originalImageUrl %>" style="max-height: 200px; object-fit: cover; border-radius: var(--radius-sm);" alt="Current Property Image">
+                    <% } else { %>
+                        <p class="text-muted">No images uploaded yet.</p>
+                    <% } %>
+                </div>
+                <label for="images" class="form-label text-muted">Upload Replacement Images (Optional)</label>
+                <input type="file" id="images" name="listing[images]" class="form-control" multiple>
+                <p class="text-muted mt-2" style="font-size: 0.75rem;">Uploading new files will replace all existing property photos.</p>
+            </div>
+
+            <div class="row pt-2">
+                <div class="mb-4 col-md-4">
+                    <label for="price" class="form-label text-muted">Rate per Night</label>
+                    <div class="input-group input-group-lux">
+                        <span class="input-group-text">&#8377;</span>
+                        <input type="number" id="price" name="listing[price]" value="<%= listing.price %>" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-4 col-md-8">
+                    <label for="country" class="form-label text-muted">Country</label>
+                    <input type="text" id="country" name="listing[country]" value="<%= listing.country %>" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label for="location" class="form-label text-muted">Precise Location</label>
+                <input type="text" id="location" name="listing[location]" value="<%= listing.location %>" class="form-control" required>
+            </div>
+
+            <div class="d-flex justify-content-between mt-3 gap-3">
+                <a href="/listings/<%= listing._id %>" class="btn btn-outline-soft w-100 fw-medium">Cancel</a>
+                <button type="submit" class="btn btn-primary-smooth shadow-soft w-100">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>

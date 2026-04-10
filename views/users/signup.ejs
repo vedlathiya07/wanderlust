@@ -1,22 +1,29 @@
 <% layout("/layouts/boilerplate") %>
-    <div class="row mt-3">
-        <h1 class="col-6 offset-3">SignUp on Wanderlust</h1>
-        <div class="col-6 offset-3">
-            <form action="/signup" method="post" novalidate class="needs-validation">
-                <div class="mb-3">
-                    <label for="username" class="form-lable">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
-                    <div class="valid-feedback">Looks good!</div>
+<div class="container d-flex justify-content-center fade-in-up">
+    <div class="form-container w-100 p-5 mt-5 mb-5">
+        <h2 class="text-center mb-4 fw-bold text-dark pb-3">Create Account</h2>
+        <form action="/signup" method="post" novalidate class="needs-validation">
+            <div class="mb-4">
+                <label for="username" class="form-label text-muted">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+                <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="mb-4">
+                <label for="email" class="form-label text-muted">Email</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-4 pb-2">
+                <label for="password" class="form-label text-muted">Password</label>
+                <div class="password-box">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Create a strong password" required>
+                    <span class="password-toggle-icon" id="togglePassword">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </span>
+                    <div class="invalid-feedback">Please provide a password.</div>
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-lable">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-lable">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
-                </div>
-                <button class="btn btn-success">Sign-Up</button>
-            </form>
-        </div>
+            </div>
+            <button class="btn btn-primary-smooth w-100 shadow-soft">Sign Up</button>
+            <p class="text-center mt-4 text-muted" style="font-size: 0.85rem;">Already have an account? <a href="/login" class="text-dark fw-bold">Login here</a></p>
+        </form>
     </div>
+</div>

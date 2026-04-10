@@ -5,8 +5,17 @@ const passportLocalMongoose = require('passport-local-mongoose');  // must be EX
 const userSchema = new Schema({
     email: {
         type: String,
-        required: true
-    }
+        required: true,
+        unique: true
+    },
+    image: {
+        url: String,
+        filename: String,
+    },
+    wishlist: [{
+        type: Schema.Types.ObjectId,
+        ref: "Listing"
+    }]
 });
 
 userSchema.plugin(passportLocalMongoose);

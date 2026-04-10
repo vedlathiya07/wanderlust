@@ -1,55 +1,70 @@
-<style>
-    .search-btn {
-        background-color: #fe424d;
-        color: #fff;
-        border-radius: 25px;
-        padding: 0 1rem 0 1rem;
-    }
-
-    .search-btn:hover {
-        background-color: #fe424d;
-        color: #fff;
-    }
-
-    .search-btn i {
-        display: inline;
-        margin-right: 0.5rem;
-    }
-
-    .search-inp {
-        border-radius: 25px;
-        padding: 0.5rem 3rem 0.5rem 3rem;
-        font-size: 1rem;
-    }
-</style>
-
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a class="nav-link" href="/listings">Explore</a>
+<!-- Wanderlust Navbar -->
+<header class="header-container sticky-top bg-white border-bottom" style="z-index: 1040;">
+    <div class="container d-flex justify-content-between align-items-center py-2 gap-2">
+        <!-- Logo -->
+        <a href="/listings" class="text-decoration-none d-flex align-items-center flex-shrink-0">
+            <img src="/images/logo.png" alt="Wanderlust Logo" style="height: 4.3rem; width: auto;" class="logo-img">
+        </a>
+        
+        <div class="search-navbar-wrapper flex-grow-1 mx-2 mx-md-4">
+            <div class="search-back-icon d-md-none" onclick="this.parentElement.querySelector('input').blur()">
+                <i class="fa-solid fa-arrow-left text-muted"></i>
             </div>
-            <div class="navbar-nav ms-auto">
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2 search-inp" type="search" placeholder="Search destinations" />
-                    <button class="btn search-btn" type="submit"><i
-                            class="fa-solid fa-magnifying-glass"></i>Search</button>
-                </form>
-            </div>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/listings/new">Airbnb your home</a>
-                <% if (!currUser) { %>
-                    <a class="nav-link" href="/signup"><b>Sign up</b></a>
-                    <a class="nav-link" href="/login"><b>Login</b></a>
-                    <% } %>
-                        <% if (currUser) { %>
-                            <a class="nav-link" href="/logout"><b>Log out</b></a>
-                            <% } %>
-            </div>
+            <form class="d-flex w-100 position-relative luxury-search-form" action="/listings" method="GET">
+                <input type="search" class="form-control rounded-pill luxury-input pe-5" style="font-size: 0.9rem; padding: 12px 20px;" placeholder="Search..." name="search" />
+                <button type="submit" class="btn btn-search-icon">
+                    <i class="fa-solid fa-magnifying-glass text-white" style="font-size: 0.8rem;"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="d-none d-md-flex align-items-center gap-3">
+            <a href="/listings/explore" class="nav-link fw-semibold px-3 py-2 d-flex align-items-center gap-2 <%= currPath === '/listings/explore' ? 'active-pill' : '' %>" style="font-size: 0.9rem;">
+                <i class="fa-solid fa-map-location-dot"></i>Map
+            </a>
+            <a href="/listings/new" class="nav-link fw-semibold px-3 py-2 <%= currPath === '/listings/new' ? 'active-pill' : 'text-muted' %>" style="font-size: 0.9rem;">Host</a>
+
+            <% if (!currUser) { %>
+                <a href="/login" class="nav-link fw-semibold px-3 py-2 <%= currPath === '/login' ? 'active-pill' : 'text-dark' %>" style="font-size: 0.9rem;">Log in</a>
+                <a href="/signup" class="btn btn-primary-smooth px-4 py-2" style="font-size: 0.9rem;">Sign up</a>
+            <% } else { %>
+                <a href="/profile" class="nav-link fw-semibold px-3 py-2 <%= currPath === '/profile' ? 'active-pill' : 'text-dark' %>" style="font-size: 0.9rem;">Profile</a>
+                <a href="/my-bookings" class="nav-link fw-semibold px-3 py-2 <%= currPath === '/my-bookings' ? 'active-pill' : 'text-dark' %>" style="font-size: 0.9rem;">Bookings</a>
+                <a href="/logout" class="nav-link text-danger fw-semibold px-2" style="font-size: 0.9rem;">Logout</a>
+            <% } %>
+        </nav>
+
+        <!-- Mobile Hamburger -->
+        <div class="d-md-none">
+            <button class="btn btn-outline-secondary rounded-pill border-0 d-flex align-items-center px-2 py-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                <i class="fa-solid fa-bars text-muted fs-5"></i>
+            </button>
         </div>
     </div>
-</nav>
+</header>
+
+<!-- Mobile Offcanvas Menu -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel" style="max-width: 280px;">
+    <div class="offcanvas-header border-bottom py-3">
+        <h5 class="offcanvas-title fw-bold" id="mobileMenuLabel">
+            <img src="/images/logo.png" alt="Wanderlust Logo" style="height: 3rem; width: auto;">
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column p-4">
+        <a href="/listings" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-house text-muted" style="width:20px;"></i>All Listings</a>
+        <a href="/listings/explore" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3" ><i class="fa-solid fa-map-location-dot text-muted" style="width:20px;"></i>Map View</a>
+        <a href="/listings/new" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-plus-circle text-muted" style="width:20px;"></i>List Property</a>
+
+        <% if (!currUser) { %>
+            <a href="/login" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-right-to-bracket text-muted" style="width:20px;"></i>Log in</a>
+            <a href="/signup" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-user-plus text-muted" style="width:20px;"></i>Sign up</a>
+        <% } else { %>
+            <!-- <div class="py-3 border-bottom text-muted fw-medium d-flex align-items-center gap-3" style="font-size: 0.9rem;"><i class="fa-solid fa-user-circle" style="width:20px;"></i><%= currUser.username %></div> -->
+            <a href="/profile" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-id-card text-muted" style="width:20px;"></i>My Profile</a>
+            <a href="/my-bookings" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-calendar-check text-muted" style="width:20px;"></i>My Bookings</a>
+            <a href="/logout" class="text-decoration-none py-3 text-danger fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-right-from-bracket" style="width:20px;"></i>Log out</a>
+        <% } %>
+    </div>
+</div>

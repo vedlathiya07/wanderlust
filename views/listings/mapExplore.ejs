@@ -1,0 +1,30 @@
+<% layout("/layouts/boilerplate") %>
+<div class="container-fluid p-0 position-relative animate__animated animate__fadeIn">
+    <!-- Map Container -->
+    <div id="exploreMap" style="height: calc(100vh - 80px); width: 100%; border-radius: var(--radius-lg); overflow: hidden;"></div>
+    
+    <!-- Floating Action Button -->
+    <div class="position-absolute top-0 start-50 translate-middle-x mt-4 z-3 text-center">
+        <button id="findMeBtn" class="btn btn-dark shadow-lg rounded-pill px-4 py-2 fw-medium d-flex align-items-center gap-2 transition" style="background-color: var(--accent-main); border: none;">
+            <i class="fa-solid fa-location-crosshairs"></i><span>Find Nearby Listings</span>
+        </button>
+    </div>
+</div>
+
+<script id="map-listings-data" type="application/json">
+    <%- JSON.stringify(allListings.map(l => ({
+        id: l._id,
+        title: l.title,
+        price: l.price,
+        location: l.location,
+        country: l.country,
+        image: (l.images && l.images.length > 0) ? l.images[0].url : (l.image ? l.image.url : ''),
+        coordinates: l.geometry && l.geometry.coordinates ? l.geometry.coordinates : null
+    }))) %>
+</script>
+
+<script>
+    const mapToken = "<%= geoapifyKey %>";
+    window.rawListings = JSON.parse(document.getElementById('map-listings-data').textContent);
+</script>
+<script src="/js/mapExplore.js"></script>

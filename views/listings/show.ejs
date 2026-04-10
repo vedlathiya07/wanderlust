@@ -1,114 +1,586 @@
 <% layout("/layouts/boilerplate") %>
-    <script>
-        window.mapToken = "<%= radarKey %>"
-        window.coordinates = JSON.parse('<%- JSON.stringify(listing.geometry.coordinates) %>');
-        // window.coordinates = <% - JSON.stringify(listing.geometry.coordinates) %>;
-    </script>
+<script id="listing-map-data" type="application/json">
+    <%- JSON.stringify({
+        coordinates: (listing.geometry && listing.geometry.coordinates && listing.geometry.coordinates.length === 2 && listing.geometry.coordinates[0] !== 0) ? listing.geometry.coordinates : null,
+        location: `${listing.location}, ${listing.country}`,
+        title: listing.title,
+        price: listing.price.toLocaleString("en-IN"),
+        image: (listing.images && listing.images.length > 0) ? listing.images[0].url : (listing.image ? listing.image.url : null)
+    }) %>
+</script>
 
-    <body>
+<script>
+    window.mapToken = "<%= geoapifyKey %>";
+    const mapDataList = JSON.parse(document.getElementById('listing-map-data').textContent);
+    window.coordinates = mapDataList.coordinates;
+    window.listingLocation = mapDataList.location;
+    window.listingTitle = mapDataList.title;
+    window.listingPrice = mapDataList.price;
+    window.listingImage = mapDataList.image;
+</script>
 
-        <div class="row mt-3">
-            <div class="col-8 offset-3">
-                <h3>
-                    <%= listing.title %>
-                </h3>
-            </div>
-            <div class="card show-card col-6 offset-3 listing-card">
-                <img src=" <%=listing.image.url %>" class="card-img-top show-img" alt="listing_image">
-                <div class="card-body">
-                    <p class="card-text">
-                        Owned by <i>
-                            <%= listing.owner.username %>
-                        </i>
-                    </p>
-                    <p class="card-text">
-                        <%= listing.description %>
-                    </p>
-                    <p class="card-text"> &#8377; <%= listing.price.toLocaleString("en-IN") %>
-                    </p>
-                    <p class="card-text">
-                        <%= listing.location %>
-                    </p>
-                    <p class="card-text">
-                        <%= listing.country %>
-                    </p>
+<div class="hero-wrapper mb-4">
+    <div id="listingCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner show-hero-img">
+            <% if (listing.images && listing.images.length > 0) { %>
+                <% listing.images.forEach((img, index) => { %>
+                    <div class="carousel-item <%= index === 0 ? 'active' : '' %> h-100">
+                        <img src="<%= img.url %>" class="d-block w-100 h-100" style="object-fit: cover;" alt="listing_image">
+                    </div>
+                <% }) %>
+            <% } else if (listing.image && listing.image.url) { %>
+                <div class="carousel-item active h-100">
+                    <img src="<%= listing.image.url %>" class="d-block w-100 h-100" style="object-fit: cover;" alt="listing_image">
+                </div>
+            <% } else { %>
+                <div class="carousel-item active h-100">
+                    <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" class="d-block w-100 h-100" style="object-fit: cover;" alt="default_image">
+                </div>
+            <% } %>
+        </div>
+        <% if (listing.images && listing.images.length > 1) { %>
+            <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        <% } %>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <!-- Main Listing Info -->
+        <div class="col-lg-8 pe-lg-5">
+            <div class="show-header">
+                <h1 class="show-title"><%= listing.title %></h1>
+                <div class="d-flex align-items-center gap-3">
+                    <p class="show-location mb-0"><i class="fa-solid fa-location-dot me-2"></i><%= listing.location %>, <%= listing.country %></p>
+                    <% if (listing.reviews.length > 0) { 
+                        let sum = 0;
+                        for(review of listing.reviews) {
+                            sum += review.rating;
+                        }
+                        let avg = (sum / listing.reviews.length).toFixed(1);
+                    %>
+                        <div class="d-flex align-items-center gap-1 fw-bold" id="avgRatingDisplay" style="font-size: 0.95rem;">
+                            <i class="fa-solid fa-star text-warning" style="font-size: 0.8rem;"></i>
+                            <span id="avgRatingVal"><%= avg %></span>
+                            <span class="text-muted fw-normal ms-1">(<span id="reviewCountVal"><%= listing.reviews.length %></span> reviews)</span>
+                        </div>
+                    <% } else { %>
+                        <div class="d-none" id="avgRatingDisplay" style="font-size: 0.95rem;">
+                            <i class="fa-solid fa-star text-warning" style="font-size: 0.8rem;"></i>
+                            <span id="avgRatingVal">0</span>
+                            <span class="text-muted fw-normal ms-1">(<span id="reviewCountVal">0</span> reviews)</span>
+                        </div>
+                    <% } %>
                 </div>
             </div>
-            <br>
+            
+            <div class="d-flex align-items-center mb-4 pb-4 border-bottom">
+                <div class="me-3">
+                    <% if (listing.owner && listing.owner.image && listing.owner.image.url) { %>
+                        <img src="<%= listing.owner.image.url %>" class="rounded-circle border" style="width: 50px; height: 50px; object-fit: cover;">
+                    <% } else { %>
+                        <i class="fa-solid fa-user-circle fs-1 text-muted"></i>
+                    <% } %>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-medium">Hosted by <%= listing.owner.username %></h5>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem;">Exclusive Property Manager</p>
+                </div>
+            </div>
 
+            <div class="mb-5 pb-4 border-bottom">
+                <h4 class="fw-medium mb-3">About this space</h4>
+                <p class="text-muted" style="line-height: 1.8;"><%= listing.description %></p>
+            </div>
+
+            <!-- Booking Actions (If Owner) -->
             <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
-                <div class="btns">
-                    <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
-                    <form action="/listings/<%= listing._id %>?_method=DELETE" method="post">
-                        <button class="btn btn-dark offset-5">Delete</button>
+                <div class="d-flex gap-3 mb-5">
+                    <a href="/listings/<%= encodeId(listing._id) %>/edit" class="btn btn-outline-lux w-auto px-5">Edit Details</a>
+                    <form action="/listings/<%= encodeId(listing._id) %>?_method=DELETE" method="post" class="m-0">
+                        <button class="btn btn-outline-lux text-danger px-5" style="border-color: #D9534F !important;">Remove Listing</button>
                     </form>
                 </div>
-                <% } %>
-                    <div class="col-8 offset-3 mb-3">
-                        <% if (currUser ) { %>
-                            <hr>
-                            <h4>Leave a Review</h4>
-                            <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate
-                                class="needs-validation">
-                                <div class="mt-3 mb-3">
-                                    <label class="form-lable" for="rating">Rating</label>
-                                    <fieldset class="starability-slot">
-                                        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]"
-                                            value="1" checked aria-label="No rating." />
-                                        <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                                        <label for="first-rate1" title="Terrible">1 star</label>
-                                        <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                                        <label for="first-rate2" title="Not good">2 stars</label>
-                                        <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                                        <label for="first-rate3" title="Average">3 stars</label>
-                                        <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                                        <label for="first-rate4" title="Very good">4 stars</label>
-                                        <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                                        <label for="first-rate5" title="Amazing">5 stars</label>
-                                    </fieldset>
-                                </div>
-                                <div class="mb-3 mt-3">
-                                    <label class="form-lable" for="comment">Comment</label>
-                                    <textarea name="review[comment]" id="comment" rows="5" class="form-control"
-                                        cols="30" required></textarea>
-                                    <div class="invalid-feedback">Please submit some valid comments</div>
-                                </div>
-                                <button class="btn btn-outline-dark">Submit</button>
-                            </form>
-                            <hr>
-                            <% } %>
-                                <% if(listing.reviews.length> 0) { %>
-                                    <div class="row">
-                                        <p><b>All Reviews</b></p>
-                                        <% for(review of listing.reviews) { %>
-                                            <div class="card col-5 ms-3 mb-3">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">
-                                                        @<%= review.author.username %>
-                                                    </h5>
-                                                    <p class="starability-result" data-rating="<%= review.rating %>">
-                                                    </p>
-                                                    <p class="card-text">
-                                                        <%= review.comment %>
-                                                    </p>
-                                                    <form method="post"
-                                                        action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
-                                                        class="mb-3">
-                                                        <button class="btn btn-sm btn-dark">Delete</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                            <% } %>
+            <% } %>
+
+            <!-- Reviews Section -->
+            <div class="mb-5">
+                <h3 class="fw-medium mb-4">Guest Experiences</h3>
+                
+                <div id="reviewsContainer" class="row g-4 mb-5">
+                    <% if(listing.reviews.length > 0) { %>
+                        <% for(review of listing.reviews) { %>
+                            <div class="col-md-6 review-card" id="review-<%= review._id %>">
+                                <div class="details-box h-100 rounded-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 fw-bold">@<%= review.author.username %></h6>
+                                        <p class="starability-result mb-0 m-0" data-rating="<%= review.rating %>" style="transform: scale(0.6); transform-origin: right;"></p>
                                     </div>
+                                    <p class="text-muted fst-italic mb-3">"<%= review.comment %>"</p>
+                                    <% if (currUser && currUser._id.equals(review.author._id)) { %>
+                                        <div class="text-end">
+                                            <button class="btn btn-link text-danger p-0 text-decoration-none delete-review-btn" 
+                                                    data-url="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+                                                    style="font-size: 0.8rem;">Delete</button>
+                                        </div>
                                     <% } %>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <p id="noReviewsMsg" class="text-muted fst-italic mb-5 px-3">No reviews yet for this property.</p>
+                    <% } %>
+                </div>
+
+                <% if (currUser) { %>
+                    <div class="details-box rounded-0 bg-light border-0 p-4">
+                        <h4 class="fw-medium mb-3">Share your experience</h4>
+                        <form id="reviewForm" action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
+                            <div class="mb-3">
+                                <label class="form-label text-muted" for="rating">Rating</label>
+                                <fieldset class="starability-slot">
+                                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                                    <label for="first-rate1" title="Terrible">1 star</label>
+                                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                                    <label for="first-rate2" title="Not good">2 stars</label>
+                                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                                    <label for="first-rate3" title="Average">3 stars</label>
+                                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                                    <label for="first-rate4" title="Very good">4 stars</label>
+                                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                                    <label for="first-rate5" title="Amazing">5 stars</label>
+                                </fieldset>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted" for="comment">Your Comment</label>
+                                <textarea name="review[comment]" id="comment" rows="4" class="form-control bg-white" required></textarea>
+                                <div class="invalid-feedback">Please provide your feedback before submitting.</div>
+                            </div>
+                            <button class="btn btn-primary-smooth shadow-soft w-auto px-4 mt-2" id="submitReviewBtn">Submit Review</button>
+                        </form>
                     </div>
-                    <div class="col-8 offset-3 mb-4">
-                        <h5>Where you'll be</h5>
-                        <div id="map" style="height: 300px; border-radius: 12px;"></div>
-                    </div>
+                <% } %>
+            </div>
         </div>
 
-        <script src="https://js.radar.io/radar.min.js"></script>
-        <script src="/js/map.js"></script>
+        <!-- Sidebar / Booking Detail -->
+        <div class="col-lg-4">
+            <div class="position-sticky" style="top: 100px;">
+                <div class="details-box text-center mb-4 rounded-4 shadow-soft">
+                    <p class="text-muted text-uppercase mb-1" style="font-size: 0.8rem; letter-spacing: 1px;">Pricing Details</p>
+                    <h2 class="fw-bold mb-0 text-dark" id="basePriceContainer">&#8377; <%= listing.price.toLocaleString("en-IN") %></h2>
+                    <p class="text-muted mb-4">per night</p>
 
-    </body>
+                    <form action="/listings/<%= encodeId(listing._id) %>/bookings" method="POST" id="bookingForm">
+                        <div class="row g-2 mb-3">
+                            <div class="col-6 text-start">
+                                <label class="form-label text-muted small fw-bold mb-1">Check-in</label>
+                                <input type="text" name="booking[checkIn]" id="checkIn" class="form-control rounded-3 bg-light border-0" placeholder="YYYY-MM-DD" required readonly>
+                            </div>
+                            <div class="col-6 text-start">
+                                <label class="form-label text-muted small fw-bold mb-1">Check-out</label>
+                                <input type="text" name="booking[checkOut]" id="checkOut" class="form-control rounded-3 bg-light border-0" placeholder="YYYY-MM-DD" required readonly>
+                            </div>
+                        </div>
+
+                        <div id="priceBreakdown" class="bg-light p-3 rounded-3 mb-3 d-none">
+                            <div class="d-flex justify-content-between mb-1 small text-muted">
+                                <span>&#8377; <%= listing.price.toLocaleString("en-IN") %> x <span id="numNights">0</span> nights</span>
+                                <span>&#8377; <span id="subtotal">0</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between pt-2 border-top fw-bold text-dark">
+                                <span>Total Price</span>
+                                <span>&#8377; <span id="totalDisplay">0</span></span>
+                            </div>
+                        </div>
+                        
+                        <% if (currUser) { %>
+                            <button type="button" class="btn btn-primary-smooth w-100 py-3 rounded-pill fw-bold" id="reserveBtn">Reserve Now</button>
+                        <% } else { %>
+                            <a href="/login" class="btn btn-primary-smooth w-100 py-3 rounded-pill">Log in to Reserve</a>
+                        <% } %>
+                        <div id="dateError" class="text-danger small mt-2 d-none">Please select check-in and check-out dates first.</div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-start">
+                        <h6 class="fw-bold mb-2 small" style="color: var(--accent-main);"><i class="fa-regular fa-calendar-check me-2"></i>Confirmed Reservations</h6>
+                        <div id="reservedDatesList" class="text-muted d-flex flex-column gap-1" style="font-size: 0.8rem;">
+                            <!-- Dates will be injected here -->
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted mt-3 mb-0" style="font-size: 0.8rem;">You won't be charged yet.</p>
+                </div>
+
+                <div class="details-box p-0 overflow-hidden rounded-4 shadow-soft">
+                    <div class="bg-light p-3 text-center border-bottom">
+                        <h6 class="mb-0 text-uppercase text-dark" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="fa-solid fa-map-location-dot me-2"></i>Location Map</h6>
+                    </div>
+                    <div id="map" style="height: 300px; width: 100%; border: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0">
+        <h5 class="modal-title fw-bold" id="paymentModalLabel">Confirm & Pay</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+          
+        <div class="d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded-3">
+            <div class="d-flex align-items-center gap-3">
+                <% 
+                    let modalImgUrl = "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?auto=format&fit=crop&w=1920&q=80";
+                    if (listing.images && listing.images.length > 0) {
+                        modalImgUrl = listing.images[0].url;
+                    } else if (listing.image && listing.image.url) {
+                        modalImgUrl = listing.image.url;
+                    }
+                %>
+                <img src="<%= modalImgUrl %>" class="rounded-2" style="width: 60px; height: 60px; object-fit: cover;">
+                <div>
+                    <h6 class="mb-0 fw-bold"><%= listing.title %></h6>
+                    <p class="mb-0 text-muted" style="font-size: 0.85rem;"><%= listing.location %></p>
+                </div>
+            </div>
+        </div>
+
+        <h6 class="fw-bold mb-3">Payment Details</h6>
+        <form id="paymentForm">
+            <!-- Payment Method Tabs -->
+            <ul class="nav nav-pills nav-fill bg-light p-1 mb-4 rounded-3" id="paymentTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-3 fw-medium" id="card-tab" data-bs-toggle="tab" data-bs-target="#card" type="button" role="tab" style="font-size:0.85rem;"><i class="fa-regular fa-credit-card me-2"></i>Card</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-3 fw-medium" id="upi-tab" data-bs-toggle="tab" data-bs-target="#upi" type="button" role="tab" style="font-size:0.85rem;"><i class="fa-solid fa-mobile-screen-button me-2"></i>UPI</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-3 fw-medium" id="paypal-tab" data-bs-toggle="tab" data-bs-target="#paypal" type="button" role="tab" style="font-size:0.85rem;"><i class="fa-brands fa-paypal me-2"></i>PayPal</button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="paymentTabContent">
+              <!-- Credit Card Form -->
+              <div class="tab-pane fade show active" id="card" role="tabpanel">
+                  <div class="mb-3">
+                      <label class="form-label text-muted" style="font-size: 0.85rem;">Cardholder Name</label>
+                      <input type="text" class="form-control form-control-lg rounded-3 fs-6" placeholder="John Doe" id="cardNameInput">
+                  </div>
+                  <div class="mb-3">
+                      <label class="form-label text-muted" style="font-size: 0.85rem;">Card Number</label>
+                      <div class="input-group">
+                          <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-regular fa-credit-card"></i></span>
+                          <input type="text" class="form-control form-control-lg border-start-0 px-0 fs-6" placeholder="0000 0000 0000 0000" maxlength="19" id="cardNumberInput">
+                      </div>
+                  </div>
+                  <div class="row mb-4">
+                      <div class="col-6">
+                          <label class="form-label text-muted" style="font-size: 0.85rem;">Expiration</label>
+                          <input type="text" class="form-control form-control-lg rounded-3 fs-6" placeholder="MM/YY" maxlength="5">
+                      </div>
+                      <div class="col-6">
+                          <label class="form-label text-muted" style="font-size: 0.85rem;">CVV</label>
+                          <input type="password" class="form-control form-control-lg rounded-3 fs-6" placeholder="123" maxlength="3">
+                      </div>
+                  </div>
+              </div>
+              
+              <!-- UPI Form -->
+              <div class="tab-pane fade" id="upi" role="tabpanel">
+                  <div class="mb-4">
+                      <label class="form-label text-muted" style="font-size: 0.85rem;">Virtual Payment Address (UPI ID)</label>
+                      <div class="input-group mb-4">
+                          <input type="text" class="form-control form-control-lg rounded-3 fs-6" placeholder="username@upi" id="upiIdInput">
+                      </div>
+                      <div class="d-flex align-items-center justify-content-center gap-4 py-2 border rounded-3 bg-light">
+                        <i class="fa-brands fa-google-pay fs-1 text-muted"></i>
+                        <i class="fa-brands fa-amazon-pay fs-1 text-muted"></i>
+                        <span class="fw-bold fs-5 text-muted fst-italic">UPI</span>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- PayPal Form -->
+              <div class="tab-pane fade" id="paypal" role="tabpanel">
+                  <div class="mb-4 mt-2 text-center py-4 bg-light rounded-3 border">
+                      <i class="fa-brands fa-paypal ms-2" style="font-size: 3rem; color: #003087;"></i>
+                      <p class="text-muted mt-3 mb-0" style="font-size: 0.9rem;">You will be redirected to PayPal<br>to complete your secure payment.</p>
+                  </div>
+              </div>
+            </div>
+
+            <hr class="my-4">
+            <div class="d-flex justify-content-between mb-3 fw-bold fs-5">
+                <span class="text-dark">Total Amount:</span>
+                <span class="text-dark">&#8377; <%= listing.price.toLocaleString("en-IN") %></span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary-smooth w-100 py-3 rounded-pill fw-bold fs-6" id="payBtn">
+                <span id="payBtnText">Pay Now</span>
+                <div class="spinner-border spinner-border-sm text-light d-none" id="payBtnSpinner" role="status"></div>
+            </button>
+            <div id="paymentSuccessMsg" class="alert alert-success d-none mt-3 rounded-3 text-center">
+                <i class="fa-solid fa-circle-check me-2"></i> Payment Successful! Redirecting...
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<<script src="/js/map.js"></script>
+<script>
+    // --- AJAX Review System ---
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewsContainer = document.getElementById('reviewsContainer');
+    const noReviewsMsg = document.getElementById('noReviewsMsg');
+    const avgRatingDisplay = document.getElementById('avgRatingDisplay');
+    const avgRatingVal = document.getElementById('avgRatingVal');
+    const reviewCountVal = document.getElementById('reviewCountVal');
+
+    function showClientFlash(message, type = 'success') {
+        const flashContainer = document.querySelector('.flash-container') || document.createElement('div');
+        if (!flashContainer.className) {
+            flashContainer.className = 'flash-container';
+            document.body.appendChild(flashContainer);
+        }
+
+        const flashMessage = document.createElement('div');
+        flashMessage.className = `flash-message ${type} alert alert-dismissible fade show`;
+        flashMessage.role = 'alert';
+        flashMessage.innerHTML = `
+            <div class="flash-icon">
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+            </div>
+            <div class="flash-content">${message}</div>
+            <button type="button" class="flash-close" data-bs-dismiss="alert"><i class="fa-solid fa-xmark"></i></button>
+        `;
+        flashContainer.appendChild(flashMessage);
+        
+        setTimeout(() => {
+            try {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(flashMessage);
+                if (bsAlert) bsAlert.close();
+            } catch(e) {}
+        }, 5000);
+    }
+
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Manual validation check
+            const comment = document.getElementById('comment').value.trim();
+            if (!comment) {
+                this.classList.add('was-validated');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitReviewBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Submitting...';
+
+            const formData = new FormData(this);
+            const data = {
+                review: {
+                    rating: formData.get('review[rating]'),
+                    comment: comment
+                }
+            };
+
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json' 
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const result = await response.json();
+                if (result.success) {
+                    // Remove "No reviews" message if it exists
+                    const emptyMsg = document.getElementById('noReviewsMsg');
+                    if (emptyMsg) emptyMsg.remove();
+                    
+                    // Create new review HTML
+                    const newReviewHtml = `
+                        <div class="col-md-6 review-card" id="review-${result.review._id}">
+                            <div class="details-box h-100 rounded-0">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0 fw-bold">@${result.review.author.username}</h6>
+                                    <p class="starability-result mb-0 m-0" data-rating="${result.review.rating}" style="transform: scale(0.6); transform-origin: right;"></p>
+                                </div>
+                                <p class="text-muted fst-italic mb-3">"${result.review.comment}"</p>
+                                <div class="text-end">
+                                    <button class="btn btn-link text-danger p-0 text-decoration-none delete-review-btn" 
+                                            data-url="/listings/<%= listing._id %>/reviews/${result.review._id}?_method=DELETE"
+                                            style="font-size: 0.8rem;">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add to container (at top)
+                    reviewsContainer.insertAdjacentHTML('afterbegin', newReviewHtml);
+                    
+                    // Update Summary Display
+                    if (avgRatingDisplay) {
+                        avgRatingDisplay.classList.remove('d-none');
+                        if (avgRatingVal) avgRatingVal.innerText = result.avgRating;
+                        if (reviewCountVal) reviewCountVal.innerText = parseInt(reviewCountVal.innerText || "0") + 1;
+                    }
+                    
+                    this.reset();
+                    this.classList.remove('was-validated');
+                    showClientFlash(result.message);
+                }
+            } catch (err) {
+                console.error('Error submitting review:', err);
+                showClientFlash('Could not submit review. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Submit Review';
+            }
+        });
+    }
+
+    // Handle Review Deletion
+    document.addEventListener('click', async function(e) {
+        if (e.target.classList.contains('delete-review-btn')) {
+            const btn = e.target;
+            const url = btn.dataset.url;
+            const reviewCard = btn.closest('.review-card');
+
+            if (!confirm('Are you sure you want to delete this review?')) return;
+
+            btn.disabled = true;
+            btn.innerText = 'Deleting...';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST', // method-override handles DELETE
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) throw new Error('Delete failed');
+
+                const result = await response.json();
+                if (result.success) {
+                    reviewCard.classList.add('fade-out'); // Optional transition
+                    setTimeout(() => {
+                        reviewCard.remove();
+                        if (avgRatingVal) avgRatingVal.innerText = result.avgRating;
+                        if (reviewCountVal) {
+                            const newCount = parseInt(reviewCountVal.innerText) - 1;
+                            reviewCountVal.innerText = newCount;
+                            
+                            if (newCount === 0) {
+                                if (avgRatingDisplay) avgRatingDisplay.classList.add('d-none');
+                                reviewsContainer.innerHTML = '<p id="noReviewsMsg" class="text-muted fst-italic mb-5 px-3">No reviews yet for this property.</p>';
+                            }
+                        }
+                    }, 300);
+                    showClientFlash(result.message);
+                }
+            } catch (err) {
+                console.error('Error deleting review:', err);
+                showClientFlash('Could not delete review.', 'error');
+                btn.disabled = false;
+                btn.innerText = 'Delete';
+            }
+        }
+    });
+
+    // --- Sidebar Booking Logic ---
+    const reserveBtn = document.getElementById('reserveBtn');
+    if (reserveBtn) {
+        reserveBtn.addEventListener('click', function() {
+            const checkIn = document.getElementById('checkIn').value;
+            const checkOut = document.getElementById('checkOut').value;
+            const errorDiv = document.getElementById('dateError');
+            if (!checkIn || !checkOut) {
+                errorDiv.classList.remove('d-none');
+            } else {
+                errorDiv.classList.add('d-none');
+                const myModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+                myModal.show();
+            }
+        });
+    }
+
+    const payBtn = document.getElementById('payBtn');
+    if (payBtn) {
+        payBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.disabled = true;
+            document.getElementById('payBtnText').classList.add('d-none');
+            document.getElementById('payBtnSpinner').classList.remove('d-none');
+            
+            setTimeout(() => {
+                document.getElementById('payBtnSpinner').classList.add('d-none');
+                this.classList.replace('btn-primary-smooth', 'btn-success');
+                document.getElementById('payBtnText').innerText = "Confirmed!";
+                document.getElementById('payBtnText').classList.remove('d-none');
+                document.getElementById('paymentSuccessMsg').classList.remove('d-none');
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/listings/<%= encodeId(listing._id) %>/bookings';
+                const cin = document.createElement('input'); cin.type = 'hidden'; cin.name = 'booking[checkIn]'; cin.value = document.getElementById('checkIn').value;
+                const cout = document.createElement('input'); cout.type = 'hidden'; cout.name = 'booking[checkOut]'; cout.value = document.getElementById('checkOut').value;
+                form.appendChild(cin); form.appendChild(cout); document.body.appendChild(form);
+                setTimeout(() => form.submit(), 1000);
+            }, 2000);
+        });
+    }
+
+    const bookedDates = <%- JSON.stringify(listing.bookings.map(b => ({from: b.checkIn, to: b.checkOut}))) %>;
+    const basePrice = Number("<%= listing.price %>".replace(/,/g, ""));
+    const reservedList = document.getElementById("reservedDatesList");
+    if (bookedDates && bookedDates.length > 0) {
+        bookedDates.forEach(date => {
+            const start = new Date(date.from).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+            const end = new Date(date.to).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+            const div = document.createElement("div"); div.className = "d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom border-light";
+            div.innerHTML = `<span><i class="fa-solid fa-calendar-day me-2 opacity-50"></i>${start} to ${end}</span> <span class="badge" style="background-color: #fce4e4; color: #d9534f; font-size: 0.6rem;">Booked</span>`;
+            reservedList.appendChild(div);
+        });
+    } else { reservedList.innerHTML = "<div class='opacity-50 text-center py-2'>No upcoming reservations.</div>"; }
+
+    let checkoutPicker;
+    const checkinPicker = flatpickr("#checkIn", { minDate: "today", dateFormat: "Y-m-d", disable: bookedDates, onChange: (sd) => { checkoutPicker.set("minDate", sd[0].fp_incr(1)); calculatePrice(); } });
+    checkoutPicker = flatpickr("#checkOut", { minDate: "today", dateFormat: "Y-m-d", disable: bookedDates, onChange: calculatePrice });
+
+    function calculatePrice() {
+        const cin = document.getElementById("checkIn").value; const cout = document.getElementById("checkOut").value;
+        if (cin && cout) {
+            const start = new Date(cin); const end = new Date(cout);
+            const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            if (nights > 0) {
+                document.getElementById("numNights").innerText = nights;
+                document.getElementById("subtotal").innerText = (basePrice * nights).toLocaleString("en-IN");
+                document.getElementById("totalDisplay").innerText = (basePrice * nights).toLocaleString("en-IN");
+                document.getElementById("priceBreakdown").classList.remove("d-none");
+            } else { document.getElementById("priceBreakdown").classList.add("d-none"); }
+        }
+    }
+</script>

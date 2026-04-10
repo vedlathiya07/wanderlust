@@ -1,13 +1,50 @@
-<% if (success && success.length) { %>
-    <div class="alert alert-success alert-dismissible fade show col-6 offset-3" role="alert">
-        <%= success %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <% } %>
+<% if ((success && success.length) || (error && error.length)) { %>
+    <div class="flash-container">
+        <% if (success && success.length) { %>
+            <div class="flash-message success alert alert-dismissible fade show" role="alert">
+                <div class="flash-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="flash-content">
+                    <%= success %>
+                </div>
+                <button type="button" class="flash-close" data-bs-dismiss="alert" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        <% } %>
 
         <% if (error && error.length) { %>
-            <div class="alert alert-danger  alert-dismissible fade show col-6 offset-3" role="alert">
-                <%= error %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="flash-message error alert alert-dismissible fade show" role="alert">
+                <div class="flash-icon">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <div class="flash-content">
+                    <%= error %>
+                </div>
+                <button type="button" class="flash-close" data-bs-dismiss="alert" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <% } %>
+        <% } %>
+    </div>
+
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.flash-message');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                if (bsAlert) bsAlert.close();
+            });
+        }, 5000);
+
+        // Fix for browser back button: hide flash messages if page is loaded from cache
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                const container = document.querySelector('.flash-container');
+                if (container) container.style.display = 'none';
+            }
+        });
+    </script>
+<% } %>

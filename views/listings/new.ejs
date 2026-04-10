@@ -1,56 +1,63 @@
 <% layout("/layouts/boilerplate") %>
-
-    <body>
-        <div class="row">
-            <div class="col-8 offset-2">
-                <br>
-                <h3>Create a new listing </h3>
-                <form action="/listings" method="post" novalidate class="needs-validation"
-                    enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label for="title" class="form-lable">Title</label>
-                        <input type="text" id="title" name="listing[title]" placeholder="enter title"
-                            class="form-control" required>
-                        <div class="valid-feedback">Title looks good!</div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-lable">Description</label>
-                        <textarea id="description" name="listing[description]" class="form-control" required></textarea>
-                        <div class="invalid-feedback">Please enter a short description</div>
-                    </div>
-
-
-                    <div class="mb-3">
-                        <label for="image" class="form-lable">Image</label>
-                        <input type="file" id="immage" name="listing[image]" placeholder="enter image URL/link"
-                            class="form-control">
-                        required
-                    </div>
-                    <div class="row">
-                        <div class="mb-3 col-md-4">
-                            <label for="price" class="form-lable">Price</label>
-                            <input id="price" name="listing[price]" placeholder="1200" class="form-control" required>
-                            <div class="invalid-feedback">Price should be valid</div>
-                        </div>
-                        <div class="mb-3 col-md-8">
-                            <label for="country" class="form-lable">Country</label>
-                            <input type="text" id="country" name="listing[country]" placeholder="India"
-                                class="form-control" required>
-                            <div class="invalid-feedback">Country should be valid</div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="location" class="form-lable">Location</label>
-                        <input type="text" id="location" name="listing[location]" placeholder="Surat, Gujarat"
-                            class="form-control" required>
-                        <div class="invalid-feedback">Location should be valid</div>
-                    </div>
-
-                    <br>
-                    <button class="btn btn-dark add-btn">Add</button>
-                    <br><br>
-                </form>
+<div class="container d-flex justify-content-center fade-in-up">
+    <div class="form-container w-100 p-5 mt-5 mb-5" style="max-width: 800px;">
+        <h2 class="text-center mb-4 fw-bold text-dark pb-3">Curate a New Property</h2>
+        <form action="/listings" method="post" novalidate class="needs-validation" enctype="multipart/form-data">
+            
+            <div class="mb-4">
+                <label for="title" class="form-label text-muted">Property Title</label>
+                <input type="text" id="title" name="listing[title]" placeholder="e.g. Minimalist Alpine Retreat" class="form-control" required>
+                <div class="valid-feedback">Title looks great!</div>
             </div>
-        </div>
-    </body>
+
+            <div class="mb-4">
+                <label for="description" class="form-label text-muted">Detailed Description</label>
+                <textarea id="description" name="listing[description]" class="form-control" rows="5" placeholder="Describe the atmosphere, design, and unique aspects..." required></textarea>
+                <div class="invalid-feedback">Please enter a description</div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="category" class="form-label text-muted">Category</label>
+                <select id="category" name="listing[category]" class="form-select form-control" required>
+                    <option value="Curated">Curated</option>
+                    <option value="Coastal">Coastal</option>
+                    <option value="Mountain">Mountain</option>
+                    <option value="Urban">Urban</option>
+                    <option value="Nature">Nature</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Wellness">Wellness</option>
+                </select>
+            </div>
+
+            <div class="mb-4 pb-2 border-bottom">
+                <label for="images" class="form-label text-muted">Photography</label>
+                <input type="file" id="images" name="listing[images]" class="form-control mb-2" multiple required>
+                <p class="text-muted" style="font-size: 0.8rem;">Upload high-resolution, landscape-oriented images. You can select multiple files.</p>
+            </div>
+
+            <div class="row pt-2">
+                <div class="mb-4 col-md-4">
+                    <label for="price" class="form-label text-muted">Rate per Night</label>
+                    <div class="input-group input-group-lux">
+                        <span class="input-group-text">&#8377;</span>
+                        <input type="number" id="price" name="listing[price]" placeholder="15000" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-4 col-md-8">
+                    <label for="country" class="form-label text-muted">Country</label>
+                    <input type="text" id="country" name="listing[country]" placeholder="e.g. Italy" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <label for="location" class="form-label text-muted">Precise Location</label>
+                <input type="text" id="location" name="listing[location]" placeholder="e.g. Lake Como, Lombardy" class="form-control" required>
+            </div>
+
+            <div class="d-flex justify-content-between mt-3 gap-3">
+                <a href="/listings" class="btn btn-outline-soft w-100 fw-medium">Cancel</a>
+                <button type="submit" class="btn btn-primary-smooth w-100 shadow-soft">Publish Property</button>
+            </div>
+        </form>
+    </div>
+</div>

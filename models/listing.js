@@ -9,6 +9,10 @@ const listingSchema = new Schema({
         required: true,
     },
     description: String,
+    images: [{
+        url: String,
+        filename: String
+    }],
     image: {
         url: String,
         filename: String
@@ -16,6 +20,15 @@ const listingSchema = new Schema({
     price: Number,
     location: String,
     country: String,
+    avgRating: {
+        type: Number,
+        default: 0
+    },
+    category: {
+        type: String,
+        enum: ['Curated', 'Coastal', 'Mountain', 'Urban', 'Nature', 'Winter', 'Wellness'],
+        default: 'Curated'
+    },
     reviews: [{
         type: Schema.Types.ObjectId,
         ref: "Review"
@@ -24,15 +37,18 @@ const listingSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     },
+    bookings: [{
+        type: Schema.Types.ObjectId,
+        ref: "Booking"
+    }],
     geometry: {
         type: {
             type: String,
-            enum: ['Point'],
-            required: true
+            default: "Point"
         },
         coordinates: {
             type: [Number],
-            required: true
+            default: [0, 0]
         }
     }
 });
