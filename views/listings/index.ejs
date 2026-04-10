@@ -2,7 +2,7 @@
     <%= success %>
 
     <div class="hero-wrapper fade-in-up">
-        <div class="hero-large hero-rounded">
+        <div id="hero-section" class="hero-large hero-rounded">
             <div class="hero-overlay-soft"></div>
             <div class="hero-text-box">
                 <h1 class="hero-title-smooth">Escape to Tranquility</h1>
@@ -197,4 +197,17 @@
                 nextBtn.style.opacity = filterBar.scrollLeft < (filterBar.scrollWidth - filterBar.clientWidth - 20) ? '1' : '0.3';
             });
         }
+
+        // ✅ HERO AUTO IMAGE (ONLINE 4K)
+const hero = document.getElementById("hero-section");
+
+if (hero) {
+    function changeHeroImage() {
+        const url = `https://source.unsplash.com/1600x900/?luxury,villa,travel,beach,modern&${new Date().getTime()}`;
+        hero.style.backgroundImage = `url(${url})`;
+    }
+
+    changeHeroImage(); // first load
+    setInterval(changeHeroImage, 5000); // change every 5 sec
+}
     </script>
