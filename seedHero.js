@@ -9,15 +9,28 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET
 });
 
-// A curated list of stunning 4K Luxury Travel Unsplash IDs
+// A curated list of Tranquil, Minimalist, and Natural Home IDs
 const heroUnsplashIds = [
-    "542314831-c6a4d27160c9", "571896349-84233c89424d", "1499793983690-e29da59ef1c2", 
-    "1520250497591-112f2f40a3f4", "1502672260266-1c1ef2d93688", "1613553507447-514873c27eb4",
-    "1512917774080-9991f1c4c750", "1564013489117-69f20c7a48d9", "1600585154340-be6161a56a0c",
-    "1600596542815-ffad4c1539a9", "1600210492486-724fe5c33838", "1600607687920-4e2a09cf159d",
-    "1449156001428-c1901308a0d2", "1512918766775-9411bc256673", "1510798831971-661eb04b3739",
-    "1533105079780-92b9be482077", "1580587767526-17b46d03f6f1", "1582268611958-ebfd161ef9cf",
-    "1502005229762-bc13e3c99026", "1513584684034-5984462d708e"
+    "1502672260266-1c1ef2d93688", // Minimalist interior
+    "1518780664697-55e3ad937233", // Cozy cottage
+    "1523217582562-09d0def993a6", // Modern house in nature
+    "1501183638710-841dd1904471", // Bright living room
+    "1449156001428-c1901308a0d2", // Wooden cabin
+    "1600210492486-724fe5c33838", // Scandi interior
+    "1600607687920-4e2a09cf159d", // Luxury kitchen
+    "1613545325278-f24b0cae1224", // Modern exterior
+    "1484154218962-a197022b5858", // Sunny dining
+    "1600566753190-17f0bb2a6d36", // Modern bedroom
+    "1600585154340-be6161a56a0c", // Contemporary home
+    "1600596542815-ffad4c1539a9", // Elegant living
+    "1580587767526-17b46d03f6f1", // Suburban luxury
+    "1512917774080-9991f1c4c750", // Tuscan style
+    "1513584684034-5984462d708e", // Modern lighting
+    "1505691722218-368865a73e81", // Moody kitchen
+    "1448630360428-a1bc4063251a", // Warm interior
+    "1494438639946-1ebd1d20bf85", // Plant-filled room
+    "1510798831971-661eb04b3739", // Forest cabin
+    "1598227071624-99881fc1829e"  // Clean architecture
 ];
 
 async function seedHeroImages() {
