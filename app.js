@@ -34,7 +34,11 @@ app.use(express.static(path.join(__dirname, "/public")));
 // Security Middlewares
 app.use(
   mongoSanitize({
+    allowDots: true,
     replaceWith: "_",
+    onSanitize: ({ req, key }) => {
+      console.log(`Sanitized key: ${key}`);
+    },
   }),
 );
 app.use(helmet({ contentSecurityPolicy: false }));
