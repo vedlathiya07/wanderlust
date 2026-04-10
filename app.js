@@ -31,6 +31,11 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
+app.use((req, res, next) => {
+  res.locals.currPath = req.path;
+  next();
+});
+
 // Security Middlewares
 app.use(mongoSanitize());
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -110,11 +115,6 @@ app.use((req, res, next) => {
   res.locals.currPath = req.path;
   res.locals.encodeId = encodeId;
   res.locals.title = undefined; // Default
-  next();
-});
-
-app.use((req, res, next) => {
-  res.locals.currPath = req.path;
   next();
 });
 
