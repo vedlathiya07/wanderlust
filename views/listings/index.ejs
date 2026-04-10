@@ -2,21 +2,16 @@
     <%= success %>
 
     <% 
-        const heroImages = [
-            "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2070&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1613553507447-514873c27eb4?q=80&w=2070&auto=format&fit=crop"
-        ];
-        const startImg = heroImages[Math.floor(Math.random() * heroImages.length)];
+        // TRULY DYNAMIC THEME-BASED STARTING IMAGE
+        const themeKeywords = "luxury,villa,travel,architecture,hotel,pool,ocean";
+        const startImg = `https://images.unsplash.com/featured/1600x900?${themeKeywords}&auto=format&q=45`;
     %>
 
     <style>
         .hero-large {
             transition: background-image 1.5s ease-in-out;
-            background-color: #2f302c; /* Fallback dark color */
+            background-color: #343a35; 
+            background-blend-mode: overlay;
         }
     </style>
 
@@ -30,6 +25,7 @@
         </div>
     </div>
 
+    <!-- Filter Section -->
     <div class="container my-4 fade-in-up" style="animation-delay: 0.1s; position: relative; z-index: 1000;">
         <div class="filter-section mb-4">
             <div class="filter-carousel-wrapper">
@@ -46,8 +42,7 @@
                          { id: 'Winter', icon: 'fa-snowflake', label: 'Winter' },
                          { id: 'Wellness', icon: 'fa-spa', label: 'Wellness' },
                          { id: 'Camping', icon: 'fa-tent', label: 'Camping' },
-                         { id: 'Arctic', icon: 'fa-igloo', label: 'Arctic' },
-                         <!-- { id: 'Desert', icon: 'fa-cactus', label: 'Desert' } -->
+                         { id: 'Arctic', icon: 'fa-igloo', label: 'Arctic' }
                        ];
                        const safeSort = typeof currentSort !== 'undefined' ? currentSort : 'default';
                        const safeCategory = typeof activeCategory !== 'undefined' ? activeCategory : 'All';
@@ -185,18 +180,6 @@
             });
         });
 
-        let taxSwitch = document.getElementById("flexSwitchCheckDefault");
-        taxSwitch.addEventListener("change", () => {
-            let taxInfoElements = document.querySelectorAll(".tax-info");
-            for (let info of taxInfoElements) {
-                if (taxSwitch.checked) {
-                    info.style.display = "inline";
-                } else {
-                    info.style.display = "none";
-                }
-            }
-        });
-
         // Category Carousel Logic
         const filterBar = document.getElementById('filterBar');
         const prevBtn = document.getElementById('prevBtn');
@@ -217,41 +200,48 @@
             });
         }
 
-        // ✅ PREMIUM 4K HERO ROTATOR (FADE-SAFE)
+        // ✅ TRULY RANDOM THEME-BASED HERO (ZERO DELAY)
         const hero = document.getElementById("hero-section");
         if (hero) {
-            const heroImages = [
-                "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1613553507447-514873c27eb4?q=80&w=2070&auto=format&fit=crop"
-            ];
-
-            // Initial current image is set in EJS, find its index
-            const currentBg = hero.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
-            let lastIndex = heroImages.indexOf(currentBg);
+            const themeKeywords = "luxury,villa,travel,architecture,hotel,pool,ocean";
+            const baseUrl = `https://images.unsplash.com/featured/1600x900?${themeKeywords}&auto=format&q=40`;
             
-            function rotateHeroImage() {
-                let randomIndex;
-                do {
-                    randomIndex = Math.floor(Math.random() * heroImages.length);
-                } while (randomIndex === lastIndex);
-                
-                lastIndex = randomIndex;
-                const url = heroImages[randomIndex];
-                
-                // Preload to ensure smooth transition
+            let nextImageUrl = "";
+            
+            function preloadNextImage() {
+                // Generate a unique URL using cache buster
+                const uniqueUrl = `${baseUrl}&sig=${Math.random()}`;
                 const img = new Image();
-                img.src = url;
+                img.src = uniqueUrl;
                 img.onload = () => {
-                    hero.style.backgroundImage = `url(${url})`;
+                    nextImageUrl = uniqueUrl;
                 };
             }
 
-            // Start rotating every 2 minutes as requested
-            setInterval(rotateHeroImage, 1000 * 60 * 2); 
+            function rotateHero() {
+                if (nextImageUrl) {
+                    hero.style.backgroundImage = `url(${nextImageUrl})`;
+                    preloadNextImage(); // Immediately start loading the one after
+                } else {
+                    // Fallback if the next image isn't ready yet or first run
+                    preloadNextImage();
+                }
+            }
+
+            // Initially start preloading the next image
+            preloadNextImage();
+            
+            // Rotate every 2 minutes
+            setInterval(rotateHero, 1000 * 60 * 2); 
         }
+
+        // Tax switch
+        let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+        taxSwitch.addEventListener("change", () => {
+            let taxInfoElements = document.querySelectorAll(".tax-info");
+            for (let info of taxInfoElements) {
+                info.style.display = taxSwitch.checked ? "inline" : "none";
+            }
+        });
     </script>
 t>
