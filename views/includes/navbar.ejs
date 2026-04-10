@@ -25,7 +25,7 @@
             </a>
             <a href="/listings/new" class="nav-link fw-semibold px-3 py-2 <%= currPath === '/listings/new' ? 'active-pill' : 'text-muted' %>" style="font-size: 0.9rem;">Host</a>
 
-            <% if (!currUser) { %>
+            <% if (typeof currUser === "undefined" || !currUser) { %>
                 <a href="/login" class="nav-link fw-semibold px-3 py-2 <%= currPath === '/login' ? 'active-pill' : 'text-dark' %>" style="font-size: 0.9rem;">Log in</a>
                 <a href="/signup" class="btn btn-primary-smooth px-4 py-2" style="font-size: 0.9rem;">Sign up</a>
             <% } else { %>
@@ -57,7 +57,7 @@
         <a href="/listings/explore" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3" ><i class="fa-solid fa-map-location-dot text-muted" style="width:20px;"></i>Map View</a>
         <a href="/listings/new" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-plus-circle text-muted" style="width:20px;"></i>List Property</a>
 
-        <% if (!currUser) { %>
+        <% if (typeof currUser === "undefined" || !currUser) { %>
             <a href="/login" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-right-to-bracket text-muted" style="width:20px;"></i>Log in</a>
             <a href="/signup" class="text-decoration-none py-3 border-bottom text-dark fw-medium d-flex align-items-center gap-3"><i class="fa-solid fa-user-plus text-muted" style="width:20px;"></i>Sign up</a>
         <% } else { %>
