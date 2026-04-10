@@ -198,16 +198,37 @@
             });
         }
 
-        // ✅ HERO AUTO IMAGE (ONLINE 4K)
-const hero = document.getElementById("hero-section");
+        // ✅ PREMIUM 4K HERO ROTATOR
+        const hero = document.getElementById("hero-section");
+        if (hero) {
+            const heroImages = [
+                "https://images.unsplash.com/photo-1542314831-c6a4d27160c9?q=80&w=2070&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=2070&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2070&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1613553507447-514873c27eb4?q=80&w=2070&auto=format&fit=crop"
+            ];
 
-if (hero) {
-    function changeHeroImage() {
-        const url = `https://source.unsplash.com/1600x900/?luxury,villa,travel,beach,modern&${new Date().getTime()}`;
-        hero.style.backgroundImage = `url(${url})`;
-    }
+            let lastIndex = -1;
+            function changeHeroImage() {
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * heroImages.length);
+                } while (randomIndex === lastIndex);
+                
+                lastIndex = randomIndex;
+                const url = heroImages[randomIndex];
+                
+                // Preload to avoid flicker
+                const img = new Image();
+                img.src = url;
+                img.onload = () => {
+                    hero.style.backgroundImage = `url(${url})`;
+                };
+            }
 
-    changeHeroImage(); // first load
-    setInterval(changeHeroImage, 5000); // change every 5 sec
-}
+            changeHeroImage(); // Load random on refresh
+            setInterval(changeHeroImage, 1000 * 60 * 2); // Smooth rotate every 2 minutes
+        }
     </script>
