@@ -127,6 +127,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Home Route - Redirect to listings
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
+
 // Legal Routes
 app.get("/privacy", (req, res) => {
   res.render("legal/privacy");
